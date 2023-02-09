@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller {
 	/*
@@ -35,6 +37,33 @@ class LoginController extends Controller {
 	 */
 	public function __construct() {
 		$this->middleware('guest')->except('logout');
+	}
+
+	/**
+	 * Get the failed login response instance.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\RedirectResponse
+	 */
+	protected function sendFailedLoginResponse(Request $request) {
+		$errors  = [$this->username() => trans('auth.failed')];
+		$message = "These credentials do not match our records.";
+
+		// Load user from database
+		$user = User::where($this->username(), $request->{$this->username()})->first();
+
+		if ($user && !Hash::check($request->password, $user->password)) {
+			$errors  = ['password' => 'Wrong password.'];
+			$message = 'Wrong password.';
+		}
+
+		if ($request->expectsJson()) {
+			return response()->json(array('message' => $message, 'errors' => $errors), 422);
+		}
+
+		return redirect()->back()
+			->withInput($request->only($this->username(), 'remember'))
+			->withErrors($errors);
 	}
 
 	/**
