@@ -19,4 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 	return $request->user();
 });
 
-Route::resource('tasks', TaskController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::middleware(['auth:sanctum'])->group(function () {
+	Route::resource('tasks', TaskController::class)->only(['index', 'store', 'update', 'destroy']);
+});
