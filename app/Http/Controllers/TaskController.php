@@ -25,6 +25,10 @@ class TaskController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function store(Request $request) {
+		$validated = $request->validate([
+			'title' => 'required|max:50',
+		]);
+
 		$task              = new Task;
 		$task->title       = $request->title;
 		$task->description = $request->description;
@@ -54,6 +58,10 @@ class TaskController extends Controller {
 	 */
 	public function update(Request $request, $id) {
 		$task = Task::find($id);
+
+		$validated = $request->validate([
+			'title' => 'required|max:50',
+		]);
 
 		$task->title       = $request->title;
 		$task->description = $request->description;
