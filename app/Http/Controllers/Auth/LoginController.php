@@ -46,14 +46,14 @@ class LoginController extends Controller {
 	 * @return \Illuminate\Http\RedirectResponse
 	 */
 	protected function sendFailedLoginResponse(Request $request) {
-		$errors  = [$this->username() => trans('auth.failed')];
-		$message = "These credentials do not match our records.";
+		$errors  = [$this->username() => array(trans('auth.failed'))];
+		$message = 'These credentials do not match our records.';
 
 		// Load user from database
 		$user = User::where($this->username(), $request->{$this->username()})->first();
 
 		if ($user && !Hash::check($request->password, $user->password)) {
-			$errors  = ['password' => 'Wrong password.'];
+			$errors  = ['password' => array('Wrong password.')];
 			$message = 'Wrong password.';
 		}
 
